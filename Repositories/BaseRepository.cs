@@ -1,5 +1,7 @@
-﻿using CrudCore.Interfaces;
+﻿using CrudCore.Enums;
+using CrudCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
+
 namespace CrudCore.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class, IEntity
@@ -20,16 +22,16 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IEntity
 		return entity;
 	}
 
-	public virtual async Task<IEnumerable<T>> GetAllAsync()
+	public virtual async Task<IEnumerable<T>> GetAllAsync(IncludeStrategy strategy = IncludeStrategy.WithCollections)
 	{
-		return await _dbSet
+		return await WithIncludes(strategy)
 			.AsNoTracking()
 			.ToListAsync();
 	}
 
-	public virtual async Task<T?> GetByIdAsync(int id)
+	public virtual async Task<T?> GetByIdAsync(int id, IncludeStrategy strategy = IncludeStrategy.WithCollections)
 	{
-		return await _dbSet
+		return await WithIncludes(strategy)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(e => e.Id == id);
 	}
@@ -47,4 +49,29 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IEntity
 		return entity;
 	}
 
+	public IQueryable<T> WithIncludes(IncludeStrategy strategy)
+	{
+		IQueryable<T> query = _dbSet;
+
+		if (strategy >= IncludeStrategy.ReferencesOnly)
+		{
+			query = AddReferences(query);
+		}
+
+		if (strategy == IncludeStrategy.WithCollections)
+		{
+			query = AddCollections(query);
+		}
+
+		return query;
+	}
+
+	protected virtual IQueryable<T> AddReferences(IQueryable<T> query)
+	{
+		return query;
+	}
+	protected virtual IQueryable<T> AddCollections(IQueryable<T> query)
+	{
+		return query;
+	}
 }

@@ -1,4 +1,5 @@
 ﻿
+using CrudCore.Enums;
 using CrudCore.Interfaces;
 using CrudCore.Repositories;
 using CrudCore.Services.Helpers;
@@ -13,9 +14,9 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity
 	{
 		_repository = repository;
 	}
-	public virtual async Task<T> GetByIdAsync(int id)
+	public virtual async Task<T> GetByIdAsync(int id, IncludeStrategy strategy = IncludeStrategy.WithCollections)
 	{
-		T? result = await _repository.GetByIdAsync(id);
+		T? result = await _repository.GetByIdAsync(id, strategy);
 		if (result == null)
 		{
 			throw new Exception("Resource not found");
@@ -23,9 +24,9 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity
 		return result;
 	}
 
-	public virtual async Task<IEnumerable<T>> GetAllAsync()
+	public virtual async Task<IEnumerable<T>> GetAllAsync(IncludeStrategy strategy = IncludeStrategy.WithCollections)
 	{
-		return await _repository.GetAllAsync();
+		return await _repository.GetAllAsync(strategy);
 	}
 
 	public virtual async Task<T> AddAsync(T entity)
