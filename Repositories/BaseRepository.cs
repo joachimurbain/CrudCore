@@ -1,15 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Wattsup.DAL.Database;
-using Wattsup.DAL.Repositories.Base.Interfaces;
-using Wattsup.Domain.Models;
+﻿using CrudCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
+namespace CrudCore.Repositories;
 
-namespace Wattsup.DAL.Repositories.Base;
 public class BaseRepository<T> : IBaseRepository<T> where T : class, IEntity
 {
-	protected readonly WattsupDbContext _dbContext;
+	protected readonly DbContext _dbContext;
 	protected readonly DbSet<T> _dbSet;
 
-	public BaseRepository(WattsupDbContext dbContext)
+	public BaseRepository(DbContext dbContext)
 	{
 		_dbContext = dbContext;
 		_dbSet = dbContext.Set<T>();

@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Wattsup.BLL.Services.Base.Interfaces;
+﻿using CrudCore.Controllers.Helpers;
+using CrudCore.Interfaces;
+using CrudCore.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Wattsup.Api.Controllers.Base;
+
+namespace CrudCore.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public abstract class BaseDtoController<TEntity, TCreateDto, TUpdateDto, TDetailsDto, TListDto> : ControllerBase
-	where TEntity : class
+	where TEntity : class, IEntity
 	where TCreateDto : class
 	where TUpdateDto : class
 	where TDetailsDto : class
@@ -54,12 +57,13 @@ public abstract class BaseDtoController<TEntity, TCreateDto, TUpdateDto, TDetail
 			return BadRequest(ModelState);
 		}
 
-		TEntity entity = ToUpdatedEntity(dto);
 
-		((dynamic)entity).Id = id;
+		//var partialEntity = PatchEntityBuilder.BuildPartial<TEntity, TUpdateDto>(dto);
 
-		entity = await _service.UpdateAsync(entity);
-		return Ok(ToDetailsDto(entity));
+		var patch = PatchEntityBuilder.BuildPartial<TEntity, TUpdateDto>(dto);
+
+		var updated = await _service.UpdateAsync(id, patch);
+		return Ok(ToDetailsDto(updated));
 	}
 
 	[HttpDelete("{id}")]
@@ -71,7 +75,6 @@ public abstract class BaseDtoController<TEntity, TCreateDto, TUpdateDto, TDetail
 
 
 	protected abstract TEntity ToEntity(TCreateDto createDto);
-	protected abstract TEntity ToUpdatedEntity(TUpdateDto dto);
 	protected abstract TDetailsDto ToDetailsDto(TEntity entity);
 	protected abstract TListDto ToListDto(TEntity entity);
 

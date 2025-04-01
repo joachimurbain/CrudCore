@@ -1,4 +1,4 @@
-﻿namespace Wattsup.Domain.Interfaces;
+﻿namespace CrudCore.Interfaces;
 public interface IValidatable
 {
 	void Validate();

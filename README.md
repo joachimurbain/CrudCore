@@ -1,5 +1,4 @@
-# CrudCore 🧱
-
+﻿# CrudCore 🧱
 A minimal, reusable base layer for building CRUD APIs in ASP.NET Core.
 
 This project contains foundational building blocks like:
@@ -20,3 +19,13 @@ CrudCore was born out of necessity, to help me move fast, keep things clean.
 ## ⚙️ How to Use
 
 See [USAGE.md](./USAGE.md) for a full example with code snippets.
+
+Appsettings.json
+
+```
+  "Jwt": {
+    "Key": "une-super-cle-tres-longue-f387e774-be91-4cef-9561-655ca8844f55",
+    "Issuer": "Wattsup",
+    "Audience": "Wattsup"
+  }
+```
