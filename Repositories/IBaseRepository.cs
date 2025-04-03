@@ -4,11 +4,10 @@ namespace CrudCore.Repositories;
 
 public interface IBaseRepository<T> where T : class
 {
-	Task<T?> GetByIdAsync(int id, IncludeStrategy strategy = IncludeStrategy.WithCollections);
-	Task<IEnumerable<T>> GetAllAsync(IncludeStrategy strategy = IncludeStrategy.WithCollections);
+	Task<T?> GetByIdAsync(int id, TrackingBehavior tracking = TrackingBehavior.NoTracking);
+	Task<IEnumerable<T>> GetAllAsync(TrackingBehavior tracking = TrackingBehavior.NoTracking);
 	Task<T> AddAsync(T entity);
 	Task<T> UpdateAsync(T entity);
 	Task RemoveAsync(T entity);
-	IQueryable<T> WithIncludes(IncludeStrategy strategy);
 
 }

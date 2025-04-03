@@ -6,72 +6,66 @@ namespace CrudCore.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class, IEntity
 {
-	protected readonly DbContext _dbContext;
-	protected readonly DbSet<T> _dbSet;
+    protected readonly DbContext _dbContext;
+    protected readonly DbSet<T> _dbSet;
 
-	public BaseRepository(DbContext dbContext)
-	{
-		_dbContext = dbContext;
-		_dbSet = dbContext.Set<T>();
-	}
+    public BaseRepository(DbContext dbContext)
+    {
+        _dbContext = dbContext;
+        _dbSet = dbContext.Set<T>();
+    }
 
-	public virtual async Task<T> AddAsync(T entity)
-	{
-		await _dbSet.AddAsync(entity);
-		await _dbContext.SaveChangesAsync();
-		return entity;
-	}
+    public virtual async Task<T?> GetByIdAsync(int id, TrackingBehavior tracking = TrackingBehavior.NoTracking)
+    {
+        var query = _dbSet.AsQueryable();
 
-	public virtual async Task<IEnumerable<T>> GetAllAsync(IncludeStrategy strategy = IncludeStrategy.WithCollections)
-	{
-		return await WithIncludes(strategy)
-			.AsNoTracking()
-			.ToListAsync();
-	}
+        query = AddIncludes(query);
 
-	public virtual async Task<T?> GetByIdAsync(int id, IncludeStrategy strategy = IncludeStrategy.WithCollections)
-	{
-		return await WithIncludes(strategy)
-			.AsNoTracking()
-			.FirstOrDefaultAsync(e => e.Id == id);
-	}
+        if (tracking == TrackingBehavior.NoTracking)
+            query = query.AsNoTracking();
 
-	public virtual async Task RemoveAsync(T entity)
-	{
-		_dbSet.Remove(entity);
-		await _dbContext.SaveChangesAsync();
-	}
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
 
-	public virtual async Task<T> UpdateAsync(T entity)
-	{
-		_dbContext.Update(entity);
-		await _dbContext.SaveChangesAsync();
-		return entity;
-	}
+    public virtual async Task<IEnumerable<T>> GetAllAsync(TrackingBehavior tracking = TrackingBehavior.NoTracking)
+    {
+        var query = _dbSet.AsQueryable();
 
-	public IQueryable<T> WithIncludes(IncludeStrategy strategy)
-	{
-		IQueryable<T> query = _dbSet;
+        query = AddIncludes(query);
 
-		if (strategy >= IncludeStrategy.ReferencesOnly)
-		{
-			query = AddReferences(query);
-		}
+        if (tracking == TrackingBehavior.NoTracking)
+            query = query.AsNoTracking();
 
-		if (strategy == IncludeStrategy.WithCollections)
-		{
-			query = AddCollections(query);
-		}
+        return await query.ToListAsync();
+    }
 
-		return query;
-	}
+    public virtual async Task<T> AddAsync(T entity)
+    {
+        await _dbSet.AddAsync(entity);
+        await _dbContext.SaveChangesAsync();
+        return entity;
+    }
 
-	protected virtual IQueryable<T> AddReferences(IQueryable<T> query)
-	{
-		return query;
-	}
-	protected virtual IQueryable<T> AddCollections(IQueryable<T> query)
-	{
-		return query;
-	}
+    public virtual async Task<T> UpdateAsync(T entity)
+    {
+        _dbContext.Update(entity);
+        await _dbContext.SaveChangesAsync();
+        return entity;
+    }
+
+    public virtual async Task RemoveAsync(T entity)
+    {
+        _dbSet.Remove(entity);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Override this in derived repos to include navigation properties.
+    /// </summary>
+    protected virtual IQueryable<T> AddIncludes(IQueryable<T> query)
+    {
+        return query;
+    }
+
+
 }

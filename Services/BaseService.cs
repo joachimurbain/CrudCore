@@ -14,7 +14,7 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity
 	{
 		_repository = repository;
 	}
-	public virtual async Task<T> GetByIdAsync(int id, IncludeStrategy strategy = IncludeStrategy.WithCollections)
+	public virtual async Task<T> GetByIdAsync(int id, TrackingBehavior strategy = TrackingBehavior.WithCollections)
 	{
 		T? result = await _repository.GetByIdAsync(id, strategy);
 		if (result == null)
@@ -24,7 +24,7 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity
 		return result;
 	}
 
-	public virtual async Task<IEnumerable<T>> GetAllAsync(IncludeStrategy strategy = IncludeStrategy.WithCollections)
+	public virtual async Task<IEnumerable<T>> GetAllAsync(TrackingBehavior strategy = TrackingBehavior.WithCollections)
 	{
 		return await _repository.GetAllAsync(strategy);
 	}
