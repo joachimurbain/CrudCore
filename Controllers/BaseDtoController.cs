@@ -1,5 +1,6 @@
-﻿using CrudCore.Controllers.Helpers;
-using CrudCore.Interfaces;
+﻿using CrudCore.Interfaces;
+using CrudCore.Mapping;
+using CrudCore.Patching;
 using CrudCore.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +16,12 @@ public abstract class BaseDtoController<TEntity, TCreateDto, TUpdateDto, TDetail
 	where TListDto : class
 {
 	protected readonly IBaseService<TEntity> _service;
+	protected readonly IMapper _mapper;
 
-	protected BaseDtoController(IBaseService<TEntity> service)
+	protected BaseDtoController(IBaseService<TEntity> service, IMapper mapper)
 	{
 		_service = service;
+		_mapper = mapper;
 	}
 
 	[HttpGet]
@@ -56,13 +59,8 @@ public abstract class BaseDtoController<TEntity, TCreateDto, TUpdateDto, TDetail
 		{
 			return BadRequest(ModelState);
 		}
-
-
-		//var partialEntity = PatchEntityBuilder.BuildPartial<TEntity, TUpdateDto>(dto);
-
-		var patch = PatchEntityBuilder.BuildPartial<TEntity, TUpdateDto>(dto);
-
-		var updated = await _service.UpdateAsync(id, patch);
+		PatchModel<TEntity> patch = PatchEntityBuilder.BuildPartial<TEntity, TUpdateDto>(dto);
+		TEntity updated = await _service.UpdateAsync(id, patch);
 		return Ok(ToDetailsDto(updated));
 	}
 
@@ -74,9 +72,13 @@ public abstract class BaseDtoController<TEntity, TCreateDto, TUpdateDto, TDetail
 	}
 
 
-	protected abstract TEntity ToEntity(TCreateDto createDto);
-	protected abstract TDetailsDto ToDetailsDto(TEntity entity);
-	protected abstract TListDto ToListDto(TEntity entity);
+	protected virtual TEntity ToEntity(TCreateDto createDto)
+		=> _mapper.Map<TCreateDto, TEntity>(createDto);
 
+	protected virtual TDetailsDto ToDetailsDto(TEntity entity)
+		=> _mapper.Map<TEntity, TDetailsDto>(entity);
+
+	protected virtual TListDto ToListDto(TEntity entity)
+		=> _mapper.Map<TEntity, TListDto>(entity);
 
 }

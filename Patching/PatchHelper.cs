@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
-using CrudCore.Controllers.Helpers;
 
-namespace CrudCore.Services.Helpers;
+namespace CrudCore.Patching;
 public static class PatchHelper
 {
 	public static void ApplyToEntity<TEntity>(PatchModel<TEntity> patchModel, TEntity target)

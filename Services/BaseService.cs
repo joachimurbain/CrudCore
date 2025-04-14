@@ -1,8 +1,8 @@
 ﻿
 using CrudCore.Enums;
 using CrudCore.Interfaces;
+using CrudCore.Patching;
 using CrudCore.Repositories;
-using CrudCore.Services.Helpers;
 
 
 namespace CrudCore.Services;
@@ -14,9 +14,9 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity
 	{
 		_repository = repository;
 	}
-	public virtual async Task<T> GetByIdAsync(int id, TrackingBehavior strategy = TrackingBehavior.WithCollections)
+	public virtual async Task<T> GetByIdAsync(int id, TrackingBehavior tracking = TrackingBehavior.NoTracking)
 	{
-		T? result = await _repository.GetByIdAsync(id, strategy);
+		T? result = await _repository.GetByIdAsync(id, tracking);
 		if (result == null)
 		{
 			throw new Exception("Resource not found");
@@ -24,9 +24,9 @@ public class BaseService<T> : IBaseService<T> where T : class, IEntity
 		return result;
 	}
 
-	public virtual async Task<IEnumerable<T>> GetAllAsync(TrackingBehavior strategy = TrackingBehavior.WithCollections)
+	public virtual async Task<IEnumerable<T>> GetAllAsync(TrackingBehavior tracking = TrackingBehavior.NoTracking)
 	{
-		return await _repository.GetAllAsync(strategy);
+		return await _repository.GetAllAsync(tracking);
 	}
 
 	public virtual async Task<T> AddAsync(T entity)

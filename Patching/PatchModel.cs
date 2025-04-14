@@ -1,4 +1,4 @@
-﻿namespace CrudCore.Services.Helpers;
+﻿namespace CrudCore.Patching;
 
 public class PatchModel<T> where T : class
 {
