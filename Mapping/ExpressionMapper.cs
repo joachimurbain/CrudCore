@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using CrudCore.Attributes;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -26,7 +27,7 @@ public class ExpressionMapper : IMapper
 
 			List<MemberBinding> bindings = typeof(TTarget)
 				.GetProperties()
-				.Where(t => t.CanWrite)
+				.Where(t => t.CanWrite && !t.IsDefined(typeof(SkipAutoMapperAttribute), true))
 				.Select(targetProperty =>
 				{
 
@@ -35,8 +36,6 @@ public class ExpressionMapper : IMapper
 					bool isRequired = targetProperty
 						.GetCustomAttributes(typeof(RequiredMemberAttribute), true)
 						.Any();
-
-
 
 					if (sourceProperty == null || sourceProperty.PropertyType != targetProperty.PropertyType)
 					{
